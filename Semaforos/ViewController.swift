@@ -9,17 +9,19 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
-    let dispatchGroupGLOBAL = DispatchGroup()
-    let semaphore = DispatchSemaphore(value: 1)
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        taskA(semaphore: semaphore)
-        taskB(semaphore: semaphore)
-        taskC(semaphore: semaphore)
-        taskD(semaphore: semaphore)
+        DispatchQueue.global(qos: .userInitiated).async {
+            let semaphore = DispatchSemaphore(value: 1)
+            self.taskA(semaphore: semaphore)
+            self.taskB(semaphore: semaphore)
+            self.taskC(semaphore: semaphore)
+            self.taskD(semaphore: semaphore)
+        }
+        
+        
     }
 
     
@@ -52,7 +54,7 @@ class ViewController: UIViewController {
                              queue: DispatchQueue.global(qos: .default),
                              execute: {
                                 print("==========END Task C=========")
-                                self.semaphore.signal()
+                                semaphore.signal()
         })
     }
     
