@@ -12,14 +12,36 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        let dispatchGroup = DispatchGroup()
+        
+        for i in 1...100 {
+            let job = BackgroundJob(withID: i)
+            sendJob(withJob: job, dispatchGroup: dispatchGroup)
+            
+        }
+
+        dispatchGroup.notify(qos: DispatchQoS.background,
+                             flags: DispatchWorkItemFlags.assignCurrentContext,
+                             queue: DispatchQueue.global(qos: .default),
+                             execute: {
+                                
+                                print("END OF EVERYTHING")
+        })
+
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func sendJob(withJob job: BackgroundJob, dispatchGroup: DispatchGroup) {
+        
+        dispatchGroup.enter()
+        
+        DispatchQueue.global(qos: .background).async {
+            
+            //do my stuff
+            job.doTask()
+            dispatchGroup.leave()
+        }
     }
-
 
 }
 
